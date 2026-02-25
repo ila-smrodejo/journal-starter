@@ -32,8 +32,8 @@ async def create_entry(
         # Return success response (FastAPI handles datetime serialization automatically)
         return {"detail": "Entry created successfully", "entry": created_entry}
     except Exception as e:
-        raise HTTPException(
-            status_code=400, detail=f"Error creating entry: {str(e)}") from e
+        raise HTTPException(status_code=400, detail=f"Error creating entry: {str(e)}") from e
+
 
 
 @router.get("/entries")
@@ -45,8 +45,6 @@ async def get_all_entries(entry_service: EntryService = Depends(get_entry_servic
 
 @router.get("/entries/{entry_id}")
 async def get_entry(entry_id: str, entry_service: EntryService = Depends(get_entry_service)):
-    # Get single entry by ID
-    # Checking if entry_service is not empty
     result = await entry_service.get_entry(entry_id)
     if not result:
         raise HTTPException(status_code=404, detail="Entry not found")
@@ -78,28 +76,44 @@ async def delete_entry(entry_id: str, entry_service: EntryService = Depends(get_
 
 @router.delete("/entries")
 async def delete_all_entries(entry_service: EntryService = Depends(get_entry_service)):
-    """Delete all journal entries"""
     await entry_service.delete_all_entries()
     return {"detail": "All entries deleted"}
 
 
 @router.post("/entries/{entry_id}/analyze")
 async def analyze_entry(entry_id: str, entry_service: EntryService = Depends(get_entry_service)):
+    """
+    Analyze a journal entry using AI.
 
-    result = await entry_service.get_entry(entry_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Entry not found")
+    Returns sentiment, summary, key topics, entry_id, and created_at timestamp.
 
-    # Combine work, struggle, and intention into entry_text
-    # entry_text = ""
-    entry_text = f"Work: {result['work']}\nStruggle: {result['struggle']}\nIntention: {result['intention']}"
+    Response format:
+    {
+        "entry_id": "string",
+        "sentiment": "positive | negative | neutral",
+        "summary": "2 sentence summary of the entry",
+        "topics": ["topic1", "topic2", "topic3"],
+        "created_at": "timestamp"
+    }
 
-    try:
-        analysis = await analyze_journal_entry(entry_id, entry_text)
-        return analysis
-    except NotImplementedError:
-        raise HTTPException(
-            status_code=501, detail="LLM analysis not yet implemented")
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Analysis failed: {str(e)}")
+    TODO: Implement this endpoint. Steps:
+    1. Fetch the entry from database using entry_service.get_entry(entry_id)
+    2. Return 404 if entry not found
+    3. Combine work + struggle + intention into text
+    4. Call llm_service.analyze_journal_entry(entry_id, entry_text)
+    5. Return the analysis result
+    6. Wrap the LLM call in try/except to handle errors gracefully:
+       - Catch NotImplementedError and return 501
+       - Catch other exceptions and return 500 with a helpful detail message
+
+    Example error handling:
+        try:
+            analysis = await analyze_journal_entry(entry_id, entry_text)
+        except NotImplementedError:
+            raise HTTPException(status_code=501, detail="LLM analysis not yet implemented")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+    """
+    raise HTTPException(
+        status_code=501, detail="Implement this endpoint - see Learn to Cloud curriculum"
+    )
