@@ -93,7 +93,7 @@ async def analyze_entry(entry_id: str, entry_service: EntryService = Depends(get
         f"Work: {result['work']}\nStruggle: {result['struggle']}\nIntention: {result['intention']}"
     )
 
-    try:  # Try block for LLM analysis
+    try:  # LLM analysis
         analysis = await analyze_journal_entry(entry_id, entry_text)
         return analysis
     except NotImplementedError:
