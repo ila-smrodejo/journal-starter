@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from api.models.entry import Entry, EntryCreate
 from api.repositories.postgres_repository import PostgresDB
 from api.services.entry_service import EntryService
+from api.services.llm_service import analyze_journal_entry
 
 router = APIRouter()
 
@@ -33,9 +34,6 @@ async def create_entry(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error creating entry: {str(e)}") from e
 
-
-# Implements GET /entries endpoint to list all journal entries
-# Example response: [{"id": "123", "work": "...", "struggle": "...", "intention": "..."}]
 
 
 @router.get("/entries")
